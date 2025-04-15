@@ -1,8 +1,6 @@
 "use client"
 
-// src/components/sections/ServiceAreas.tsx
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -61,20 +59,28 @@ const branches: Branch[] = [
     email: 'delhi@shivamtransport.com',
     timing: 'Mon-Sat: 9:00 AM - 7:00 PM',
   },
-  // Add more branches as needed
 ];
+
+const features = ['Door to Door Service', '24/7 Support', 'Real-time Tracking', 'Nationwide Network'];
 
 const ServiceAreas = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedRegion, setSelectedRegion] = React.useState('All');
 
-  const filteredCities = serviceCities.filter(city => {
-    const matchesSearch = city.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRegion = selectedRegion === 'All' || city.region === selectedRegion;
-    return matchesSearch && matchesRegion;
-  });
+  // Using useMemo to create regions array
+  const regions = useMemo(() => {
+    const uniqueRegions = Array.from(new Set(serviceCities.map(city => city.region)));
+    return ['All', ...uniqueRegions];
+  }, []);
 
-  const regions = ['All', ...new Set(serviceCities.map(city => city.region))];
+  // Filter cities based on search and region
+  const filteredCities = useMemo(() => {
+    return serviceCities.filter(city => {
+      const matchesSearch = city.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRegion = selectedRegion === 'All' || city.region === selectedRegion;
+      return matchesSearch && matchesRegion;
+    });
+  }, [searchTerm, selectedRegion]);
 
   return (
     <section className="py-20 bg-white">
@@ -219,7 +225,7 @@ const ServiceAreas = () => {
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-4">
-              {['Door to Door Service', '24/7 Support', 'Real-time Tracking', 'Nationwide Network'].map((feature, index) => (
+              {features.map((feature, index) => (
                 <div key={index} className="flex items-center">
                   <CheckCircle2 className="w-5 h-5 text-green-500 mr-2" />
                   <span>{feature}</span>
